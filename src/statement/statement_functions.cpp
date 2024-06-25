@@ -23,6 +23,9 @@
 #include <codecvt>
 #include <locale>
 
+// TODO: REMOVE THIS!!!
+#include <iostream>
+
 using duckdb::date_t;
 using duckdb::Decimal;
 using duckdb::DecimalType;
@@ -310,9 +313,9 @@ SQLRETURN duckdb::GetDataStmtResult(OdbcHandleStmt *hstmt, SQLUSMALLINT col_or_p
 
 		SQLRETURN ret = SQL_SUCCESS;
 
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter_utf16;
-		std::u16string utf16_str = converter_utf16.from_bytes(str.data());
-		auto out_len = duckdb::MinValue(utf16_str.size(), (size_t)buffer_length);
+		std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff, std::little_endian>, char16_t> converter_wstr;
+		std::u16string w_str = converter_wstr.from_bytes(str.data());
+		auto out_len = duckdb::MinValue(w_str.size(), (size_t)buffer_length);
 		// reserving two bytes for each char
 		out_len *= 2;
 		// check space for 2 null terminator char
@@ -325,10 +328,11 @@ SQLRETURN duckdb::GetDataStmtResult(OdbcHandleStmt *hstmt, SQLUSMALLINT col_or_p
 			ret = duckdb::SetDiagnosticRecord(
 			    hstmt, SQL_SUCCESS_WITH_INFO, "SQLGetData",
 			    "Not all the data for the specified column could be retrieved, the length of the data remaining in the "
-			    "specifief column prior to the current call to SQLGetData is returned in *StrLen_or_IndPtr.",
+			    "specific column prior to the current call to SQLGetData is returned in *StrLen_or_IndPtr.",
 			    duckdb::SQLStateType::ST_01004, hstmt->dbc->GetDataSourceName());
 		}
-		memcpy((char *)target_value_ptr, (char *)utf16_str.c_str(), out_len);
+
+		memcpy((uint8_t *)target_value_ptr, (uint8_t *)w_str.c_str(), out_len);
 
 		// null terminator char
 		((char *)target_value_ptr)[out_len] = '\0';
@@ -339,6 +343,7 @@ SQLRETURN duckdb::GetDataStmtResult(OdbcHandleStmt *hstmt, SQLUSMALLINT col_or_p
 		}
 		return ret;
 	}
+
 	// case SQL_C_VARBOOKMARK: // same ODBC type (\\TODO we don't support bookmark types)
 	case SQL_C_BINARY: {
 		// threating binary values as BLOB type

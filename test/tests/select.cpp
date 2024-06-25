@@ -1,5 +1,5 @@
 #include "odbc_test_common.h"
-
+#include <iostream>
 
 using namespace odbc_test;
 
@@ -65,4 +65,50 @@ TEST_CASE("Test Select Statement", "[odbc]") {
 	EXECUTE_AND_CHECK("SQLFreeHandle (HSTMT)", SQLFreeHandle, SQL_HANDLE_STMT, hstmt);
 
 	DISCONNECT_FROM_DATABASE(env, dbc);
+}
+
+static void PrintWCHAR(SQLWCHAR *content, SQLLEN content_len) {
+    std::cout << "COL :";
+    for (int i = 0; i < content_len; i++) {
+        std::cout << (uint32_t)(((uint16_t*)content)[i]) << "\n";
+    }
+    std::cout << std::endl;
+}
+
+TEST_CASE("Test Select With UTF-16", "[odbc]") {
+    SQLHANDLE env;
+    SQLHANDLE dbc;
+
+    HSTMT hstmt = SQL_NULL_HSTMT;
+
+    // Connect to the database using SQLConnect
+    DRIVER_CONNECT_TO_DATABASE(env, dbc, "database=/Users/maia/CLionProjects/duckdb-odbc/test.db");
+
+    // Allocate a statement handle
+    EXECUTE_AND_CHECK("SQLAllocHandle (HSTMT)", SQLAllocHandle, SQL_HANDLE_STMT, dbc, &hstmt);
+
+    // Execute a simple query with an UTF-16 string
+    EXECUTE_AND_CHECK("SQLExecDirect (SELECT)", SQLExecDirect, hstmt,
+                      ConvertToSQLCHAR("from test_utf8"), SQL_NTS);
+
+    // Check the data
+    while (SQLFetch(hstmt) != SQL_NO_DATA) {
+        // Check the data
+        SQLWCHAR content[256];
+        SQLLEN content_len;
+
+        // SQLGetData returns data for a single column in the result set.
+        for (idx_t i = 0; i < 6; i++) {
+            SQLRETURN ret = SQLGetData(hstmt, i, SQL_C_WCHAR, &content, sizeof(content), &content_len);
+            ODBC_CHECK(ret, "SQLGetData");
+
+            PrintWCHAR(content, content_len);
+        }
+    }
+
+    // Free the statement handle
+    EXECUTE_AND_CHECK("SQLFreeStmt (HSTMT)", SQLFreeStmt, hstmt, SQL_CLOSE);
+    EXECUTE_AND_CHECK("SQLFreeHandle (HSTMT)", SQLFreeHandle, SQL_HANDLE_STMT, hstmt);
+
+    DISCONNECT_FROM_DATABASE(env, dbc);
 }
