@@ -1,5 +1,6 @@
 #include "odbc_test_common.h"
 
+#include <iostream>
 
 using namespace odbc_test;
 
@@ -25,10 +26,15 @@ TEST_CASE("Test Spatial with Binding", "[odbc]") {
     EXECUTE_AND_CHECK("SQLExecDirect (CREATE TABLE)", SQLExecDirect, hstmt,
                       ConvertToSQLCHAR("CREATE TABLE d(OBJECTID INT64 NOT NULL, TAG STRING, SHAPE GEOMETRY)"), SQL_NTS);
 
-
     // Prepare the insert statement
     EXECUTE_AND_CHECK("SQLPrepare (INSERT INTO)", SQLPrepare, hstmt,
                       ConvertToSQLCHAR("INSERT INTO d ( OBJECTID , TAG , SHAPE ) VALUES ( ? , ? , ST_GEOMFROMTEXT(?))"), SQL_NTS);
+
+    auto ret = SQLPrepare(hstmt, ConvertToSQLCHAR("INSERT INTO d ( OBJECTID , TAG , SHAPE ) VALUES ( ? , ? , ST_GEOMFROMTEXT(?))"), SQL_NTS);
+    if (ret != SQL_SUCCESS) {
+        std::cout << "SQLPrepare failed" << std::endl;
+        return;
+    }
 
     // Bind the first row of parameters
     SQLINTEGER    c1;
