@@ -27,12 +27,15 @@ TEST_CASE("Test Spatial with Binding", "[odbc]") {
                       ConvertToSQLCHAR("CREATE TABLE d(OBJECTID INT64 NOT NULL, TAG STRING, SHAPE GEOMETRY)"), SQL_NTS);
 
     // Prepare the insert statement
-    EXECUTE_AND_CHECK("SQLPrepare (INSERT INTO)", SQLPrepare, hstmt,
-                      ConvertToSQLCHAR("INSERT INTO d ( OBJECTID , TAG , SHAPE ) VALUES ( ? , ? , ST_GEOMFROMTEXT(?))"), SQL_NTS);
-
     auto ret = SQLPrepare(hstmt, ConvertToSQLCHAR("INSERT INTO d ( OBJECTID , TAG , SHAPE ) VALUES ( ? , ? , ST_GEOMFROMTEXT(?))"), SQL_NTS);
     if (ret != SQL_SUCCESS) {
         std::cout << "SQLPrepare failed" << std::endl;
+        std::string state;
+        std::string message;
+        ACCESS_DIAGNOSTIC(state, message, hstmt, SQL_HANDLE_STMT);
+
+        std::cout << "State: " << state << std::endl;
+        std::cout << "Message: " << message << std::endl;
         return;
     }
 
