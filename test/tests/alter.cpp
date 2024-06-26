@@ -1,6 +1,6 @@
 #include "odbc_test_common.h"
 
-
+//HELLO
 using namespace odbc_test;
 
 TEST_CASE("Test ALTER TABLE statement", "[odbc]") {
