@@ -62,7 +62,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statement_handle, SQLSMALLINT data_typ
 	))";
 	// clang-format on
 
-	return duckdb::ExecDirectStmt(hstmt, (SQLCHAR *)query.c_str(), query.size());
+	return duckdb::ExecDirectStmt(hstmt, query);
 }
 
 /*** ApiInfo private attributes ********************************/

@@ -820,16 +820,9 @@ SQLRETURN duckdb::GetDataStmtResult(OdbcHandleStmt *hstmt, SQLUSMALLINT col_or_p
 	} // end switch "(target_type)": SQL_C_TYPE_TIMESTAMP
 }
 
-SQLRETURN duckdb::ExecDirectStmt(SQLHSTMT statement_handle, SQLCHAR *statement_text, SQLINTEGER text_length) {
-	duckdb::OdbcHandleStmt *hstmt = nullptr;
-	SQLRETURN ret = ConvertHSTMT(statement_handle, hstmt);
-	if (ret != SQL_SUCCESS) {
-		return ret;
-	}
-
+SQLRETURN duckdb::ExecDirectStmt(duckdb::OdbcHandleStmt *hstmt, const string& query) {
+    SQLRETURN ret;
 	bool success_with_info = false;
-	// Set up the statement and extract the query
-	auto query = GetQueryAsString(hstmt, statement_text, text_length);
 
 	// Extract the statements from the query
 	vector<unique_ptr<SQLStatement>> statements;
