@@ -366,11 +366,11 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT statement_handle) {
  * @return
  */
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statement_handle, SQLCHAR *statement_text, SQLINTEGER text_length) {
-    duckdb::OdbcHandleStmt *hstmt = nullptr;
-    SQLRETURN ret = ConvertHSTMT(statement_handle, hstmt);
-    if (!SQL_SUCCEEDED(ret)) {
-        return ret;
-    }
+	duckdb::OdbcHandleStmt *hstmt = nullptr;
+	SQLRETURN ret = ConvertHSTMT(statement_handle, hstmt);
+	if (!SQL_SUCCEEDED(ret)) {
+		return ret;
+	}
 
 	return duckdb::ExecDirectStmt(hstmt, GetQueryAsString(hstmt, statement_text, text_length));
 }
@@ -414,9 +414,8 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statement_handle, SQLCHAR *catalog_name, SQ
 
 	// special cases
 	if (catalog_n == std::string(SQL_ALL_CATALOGS) && name_length2 == 0 && name_length3 == 0 && name_length4 == 0) {
-		if (!SQL_SUCCEEDED(duckdb::ExecDirectStmt(hstmt,
-		                                          "SELECT '' \"TABLE_CAT\", NULL \"TABLE_SCHEM\", NULL "
-		                                                     "\"TABLE_NAME\", NULL \"TABLE_TYPE\" , NULL \"REMARKS\""))) {
+		if (!SQL_SUCCEEDED(duckdb::ExecDirectStmt(hstmt, "SELECT '' \"TABLE_CAT\", NULL \"TABLE_SCHEM\", NULL "
+		                                                 "\"TABLE_NAME\", NULL \"TABLE_TYPE\" , NULL \"REMARKS\""))) {
 			return SQL_ERROR;
 		}
 		return SQL_SUCCESS;
@@ -424,9 +423,8 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statement_handle, SQLCHAR *catalog_name, SQ
 
 	if (schema_n == std::string(SQL_ALL_SCHEMAS) && catalog_n.empty() && name_length3 == 0) {
 		if (!SQL_SUCCEEDED(duckdb::ExecDirectStmt(
-		        hstmt,
-		        "SELECT '' \"TABLE_CAT\", schema_name \"TABLE_SCHEM\", NULL \"TABLE_NAME\", "
-		                   "NULL \"TABLE_TYPE\" , NULL \"REMARKS\" FROM information_schema.schemata"))) {
+		        hstmt, "SELECT '' \"TABLE_CAT\", schema_name \"TABLE_SCHEM\", NULL \"TABLE_NAME\", "
+		               "NULL \"TABLE_TYPE\" , NULL \"REMARKS\" FROM information_schema.schemata"))) {
 			return SQL_ERROR;
 		}
 		return SQL_SUCCESS;
@@ -434,9 +432,8 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statement_handle, SQLCHAR *catalog_name, SQ
 
 	if (table_n == std::string(SQL_ALL_TABLE_TYPES) && name_length1 == 0 && name_length2 == 0 && name_length3 == 0) {
 		if (!SQL_SUCCEEDED(duckdb::ExecDirectStmt(
-		        hstmt,
-		        "SELECT * FROM (VALUES(NULL, NULL, NULL, 'TABLE'),(NULL, NULL, NULL, 'VIEW')) AS "
-		                   "tbl(TABLE_CAT, TABLE_SCHEM, TABLE_NAME, TABLE_TYPE)"))) {
+		        hstmt, "SELECT * FROM (VALUES(NULL, NULL, NULL, 'TABLE'),(NULL, NULL, NULL, 'VIEW')) AS "
+		               "tbl(TABLE_CAT, TABLE_SCHEM, TABLE_NAME, TABLE_TYPE)"))) {
 			return SQL_ERROR;
 		}
 		return SQL_SUCCESS;
