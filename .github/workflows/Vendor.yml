@@ -48,8 +48,8 @@ jobs:
         run: |
           git push -u origin HEAD
 
-  rebuild:
-    needs: vendor
-    if: ${{ needs.vendor.outputs.did_vendor != '' }}
-    uses: .github/workflows/ODBC.yml
-    secrets: inherit
+#  rebuild:
+#    needs: vendor
+#    if: ${{ needs.vendor.outputs.did_vendor != '' }}
+#    uses: .github/workflows/ODBC.yml
+#    secrets: inherit
