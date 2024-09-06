@@ -37,6 +37,15 @@ void ColumnBindingReplacer::VisitExpression(unique_ptr<Expression> *expression) 
 		}
 	}
 
+
+
+
+
+
+
+
+
+
 	VisitExpressionChildren(**expression);
 }
 
