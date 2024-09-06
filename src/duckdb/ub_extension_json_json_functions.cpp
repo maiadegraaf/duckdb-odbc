@@ -18,19 +18,6 @@
 
 #include "extension/json/json_functions/json_transform.cpp"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #include "extension/json/json_functions/json_create.cpp"
 
 #include "extension/json/json_functions/json_type.cpp"
