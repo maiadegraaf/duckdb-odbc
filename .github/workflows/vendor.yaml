@@ -1,4 +1,4 @@
-name: vendor
+name: Vendor
 on:
   workflow_dispatch:
 
@@ -8,7 +8,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
 
-    name: "Update vendored sources"
+    name: "Update Vendored Sources"
 
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
       - name: Run vendor script
         shell: bash
         run: |
-          python3 vendor.py --.git/duckdb
+          python3 vendor.py --duckdb .git/duckdb
           git add src/duckdb/*
           git commit -m "Update vendored sources"
           git push
