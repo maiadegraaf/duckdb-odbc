@@ -50,6 +50,6 @@ jobs:
 
   rebuild:
     needs: vendor
-#    if: ${{ needs.vendor.outputs.did_vendor != '' }}
+    if: ${{ needs.vendor.outputs.did_vendor != '' }}
     uses: ./.github/workflows/ODBC.yml
     secrets: inherit
