@@ -32,11 +32,11 @@ jobs:
       - name: Check first line of duckdb.h
         run: |
           first_line=$(head -n 1 src/duckdb/src/include/duckdb.h)
+          echo "First line of duckdb.h: $first_line"
           if [[ "$first_line" == *"WRONG"* ]]; then
             echo "Error: The wrong commit has been checked out!"
             exit 1
           fi
-          echo "First line of duckdb.h: $first_line"
 
       - uses: ./.github/actions/manylinux_2014_setup
         with:
