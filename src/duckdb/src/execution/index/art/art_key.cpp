@@ -16,13 +16,6 @@ ARTKey::ARTKey(ArenaAllocator &allocator, idx_t len) : len(len) {
 	data = allocator.Allocate(len);
 }
 
-void ARTKey::VerifyKeyLength(const idx_t max_len) const {
-	if (len > max_len) {
-		throw InvalidInputException("key size of %d bytes exceeds the maximum size of %d bytes for this ART", len,
-		                            max_len);
-	}
-}
-
 template <>
 ARTKey ARTKey::CreateARTKey(ArenaAllocator &allocator, string_t value) {
 	auto string_data = const_data_ptr_cast(value.GetData());
@@ -36,22 +29,22 @@ ARTKey ARTKey::CreateARTKey(ArenaAllocator &allocator, string_t value) {
 		}
 	}
 
-	idx_t key_len = string_len + escape_count + 1;
-	auto key_data = allocator.Allocate(key_len);
+	idx_t len = string_len + escape_count + 1;
+	auto data = allocator.Allocate(len);
 
 	// Copy over the data and add escapes.
 	idx_t pos = 0;
 	for (idx_t i = 0; i < string_len; i++) {
 		if (string_data[i] <= 1) {
 			// Add escape.
-			key_data[pos++] = '\01';
+			data[pos++] = '\01';
 		}
-		key_data[pos++] = string_data[i];
+		data[pos++] = string_data[i];
 	}
 
 	// End with a null-terminator.
-	key_data[pos] = '\0';
-	return ARTKey(key_data, key_len);
+	data[pos] = '\0';
+	return ARTKey(data, len);
 }
 
 template <>
