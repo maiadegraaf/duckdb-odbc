@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get commit SHA
-        if: {{ inputs.duckdb-sha != '' }}
+        if: ${{ inputs.duckdb-sha != '' }}
         run: |
           cd .git/duckdb && git checkout ${{ inputs.duckdb-sha }}
 
